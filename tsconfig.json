@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node", // <-- Agrega esta línea si no la tenías
+    "resolveJsonModule": true, // <-- Agrega esta línea si no la tenías
+    "allowSyntheticDefaultImports": true // <-- Agrega esta línea si no la tenías
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

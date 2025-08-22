@@ -1,0 +1,4 @@
+# Ignorar archivos y directorios de entorno
+.env
+/node_modules
+/dist

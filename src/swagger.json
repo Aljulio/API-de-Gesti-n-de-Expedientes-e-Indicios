@@ -1,0 +1,350 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Gestión de Expedientes e Indicios",
+    "version": "1.0.0",
+    "description": "API REST para la gestión de expedientes e indicios, con autenticación JWT y control de roles.",
+    "contact": {
+      "name": "Ing. Carmelo Mayén"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Servidor de desarrollo"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticación",
+      "description": "Inciar sesión y obtener un token JWT."
+    },
+    {
+      "name": "Usuarios",
+      "description": "Gestión de usuarios."
+    },
+    {
+      "name": "Expedientes",
+      "description": "Gestión de expedientes."
+    },
+    {
+      "name": "Indicios",
+      "description": "Gestión de indicios."
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Inicia sesión y obtiene un token JWT",
+        "tags": ["Autenticación"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "tecnico@prueba.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso. Devuelve un token JWT.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" },
+                    "rol": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email o contraseña incorrectos."
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "summary": "Crea un nuevo usuario",
+        "tags": ["Usuarios"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre", "email", "password", "rol"],
+                "properties": {
+                  "nombre": { "type": "string", "example": "Nuevo Usuario" },
+                  "email": { "type": "string", "example": "nuevo.usuario@ejemplo.com" },
+                  "password": { "type": "string", "example": "contrasena123" },
+                  "rol": { "type": "string", "enum": ["tecnico", "coordinador"], "example": "tecnico" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario creado exitosamente." },
+          "400": { "description": "Todos los campos son obligatorios." },
+          "409": { "description": "El correo electrónico ya existe." },
+          "500": { "description": "Error interno del servidor." }
+        }
+      }
+    },
+    "/expedientes": {
+      "get": {
+        "summary": "Obtiene una lista paginada de expedientes",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "in": "query", "name": "page", "schema": { "type": "integer", "default": 1 }, "description": "Número de página." },
+          { "in": "query", "name": "limit", "schema": { "type": "integer", "default": 10 }, "description": "Número de expedientes por página." },
+          { "in": "query", "name": "codigo", "schema": { "type": "string" }, "description": "Filtra por el código del expediente." }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de expedientes.",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Expediente" } } } }
+          },
+          "401": { "description": "No autenticado." }
+        }
+      },
+      "post": {
+        "summary": "Crea un nuevo expediente",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["codigo", "descripcion"],
+                "properties": {
+                  "codigo": { "type": "string", "example": "EXP-001" },
+                  "descripcion": { "type": "string", "example": "Expediente de prueba." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Expediente creado exitosamente." },
+          "400": { "description": "Código y descripción son obligatorios." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo técnico)." }
+        }
+      }
+    },
+    "/expedientes/{id}": {
+      "get": {
+        "summary": "Obtiene un expediente por su ID",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del expediente." }],
+        "responses": {
+          "200": {
+            "description": "Detalles del expediente.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Expediente" } } }
+          },
+          "404": { "description": "Expediente no encontrado." },
+          "401": { "description": "No autenticado." }
+        }
+      },
+      "put": {
+        "summary": "Actualiza un expediente",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del expediente." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["codigo", "descripcion"],
+                "properties": {
+                  "codigo": { "type": "string", "example": "EXP-002" },
+                  "descripcion": { "type": "string", "example": "Expediente actualizado." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Expediente actualizado exitosamente." },
+          "400": { "description": "Datos incompletos." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo técnico)." }
+        }
+      }
+    },
+    "/expedientes/{id}/estado": {
+      "patch": {
+        "summary": "Cambia el estado de un expediente",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del expediente." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["estado"],
+                "properties": {
+                  "estado": { "type": "string", "enum": ["Aprobado", "Rechazado"], "example": "Aprobado" },
+                  "justificacion": { "type": "string", "nullable": true, "example": "Revisado y aprobado." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Estado del expediente actualizado exitosamente." },
+          "400": { "description": "Estado inválido o justificación obligatoria." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo coordinador)." }
+        }
+      }
+    },
+    "/expedientes/{id}/activo": {
+      "patch": {
+        "summary": "Realiza la eliminación lógica de un expediente",
+        "tags": ["Expedientes"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del expediente." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["activo"],
+                "properties": {
+                  "activo": { "type": "boolean", "example": false }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Estado de activo actualizado." },
+          "400": { "description": "El campo 'activo' debe ser booleano." },
+          "401": { "description": "No autenticado." }
+        }
+      }
+    },
+    "/indicios/{id}": {
+      "put": {
+        "summary": "Actualiza un indicio por su ID",
+        "tags": ["Indicios"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del indicio." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Indicio" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Indicio actualizado exitosamente." },
+          "400": { "description": "La descripción es obligatoria." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo técnico)." }
+        }
+      }
+    },
+    "/expedientes/{expedienteId}/indicios": {
+      "post": {
+        "summary": "Crea un nuevo indicio para un expediente",
+        "tags": ["Indicios"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "expedienteId", "required": true, "schema": { "type": "integer" }, "description": "ID del expediente padre." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Indicio" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Indicio creado exitosamente." },
+          "400": { "description": "La descripción es obligatoria." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo técnico)." }
+        }
+      }
+    },
+    "/indicios/{id}/activo": {
+      "patch": {
+        "summary": "Realiza la eliminación lógica de un indicio",
+        "tags": ["Indicios"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del indicio." }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "required": ["activo"], "properties": { "activo": { "type": "boolean", "example": false } } }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Estado de activo del indicio actualizado." },
+          "400": { "description": "El campo 'activo' debe ser booleano." },
+          "401": { "description": "No autenticado." },
+          "403": { "description": "Acceso denegado (solo técnico)." }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "Expediente": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "codigo": { "type": "string", "example": "EXP-001" },
+          "descripcion": { "type": "string", "example": "Expediente de prueba." },
+          "estado": { "type": "string", "enum": ["Pendiente", "Aprobado", "Rechazado"], "example": "Pendiente" },
+          "justificacion": { "type": "string", "nullable": true },
+          "tecnico_id": { "type": "integer", "example": 3 },
+          "aprobador_id": { "type": "integer", "nullable": true },
+          "fecha_creacion": { "type": "string", "format": "date-time" },
+          "fecha_estado": { "type": "string", "format": "date-time", "nullable": true },
+          "activo": { "type": "boolean", "example": true }
+        }
+      },
+      "Indicio": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "expediente_id": { "type": "integer", "example": 1 },
+          "peso": { "type": "number", "example": 2.5 },
+          "color": { "type": "string", "example": "rojo" },
+          "tamano": { "type": "string", "example": "pequeño" },
+          "descripcion": { "type": "string", "example": "Indicio encontrado en la escena." },
+          "activo": { "type": "boolean", "example": true }
+        }
+      }
+    }
+  }
+}
