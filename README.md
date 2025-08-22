@@ -1,16 +1,9 @@
-
------
-
-### 1\. Archivo `README.md`
-
-Este es el archivo principal de tu repositorio. Cópialo y pégalo en un archivo llamado `README.md` en la raíz de tu proyecto.
-
 ````markdown
 # API de Gestión de Expedientes e Indicios
 
 ## Descripción del Proyecto
 
-[cite_start]Esta es una API RESTful desarrollada con **TypeScript y Express** que implementa un CRUD y un flujo de aprobación para expedientes e indicios[cite: 4]. [cite_start]El sistema cuenta con autenticación de usuarios mediante **JWT** y un control de roles (`técnico` y `coordinador`) para restringir el acceso a funcionalidades específicas[cite: 4]. [cite_start]La persistencia de datos se gestiona en una base de datos de **SQL Server** a través de procedimientos almacenados[cite: 5].
+Esta es una API RESTful desarrollada con **TypeScript y Express** que implementa un CRUD y un flujo de aprobación para expedientes e indicios. El sistema cuenta con autenticación de usuarios mediante **JWT** y un control de roles (`técnico` y `coordinador`) para restringir el acceso a funcionalidades específicas. La persistencia de datos se gestiona en una base de datos de **SQL Server** a través de procedimientos almacenados.
 
 ---
 
