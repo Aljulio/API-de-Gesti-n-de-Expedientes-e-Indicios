@@ -1,10 +1,11 @@
+````markdown
 # API de Gestión de Expedientes e Indicios
 
 ## Descripción del Proyecto
 
 Esta es una API RESTful desarrollada con **TypeScript y Express** para la gestión de expedientes e indicios, con autenticación JWT y control de roles. La persistencia de datos se gestiona en una base de datos de **SQL Server** utilizando procedimientos almacenados.
 
-
+---
 
 ## Requisitos
 
@@ -25,7 +26,7 @@ Primero, clona el repositorio e instala las dependencias del proyecto.
 git clone <URL_DEL_REPOSITORIO>
 cd api-expedientes
 npm install
-
+````
 
 ### 2\. Configurar las Variables de Entorno
 
@@ -797,7 +798,3 @@ BEGIN
 END;
 GO
 ```
-
------
-
-¡Con esto, tu proyecto está completamente documentado y listo para ser subido a GitHub\!
